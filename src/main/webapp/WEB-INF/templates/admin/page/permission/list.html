@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="cn" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/_fragments::head">
+</head>
+<body>
+<div class="layui-main">
+    <table lay-even class="layui-table layui-hide" lay-filter="mytable" lay-data="{id: 'idmytable'}">
+        <thead>
+        <tr>
+            <th lay-data="{field:'menu_id', width:50}">ID</th>
+            <th lay-data="{field:'menu_name', width:150}">名称</th>
+            <th lay-data="{field:'menu_url', width:200}">地址</th>
+            <th lay-data="{field:'parent_id', width:200}">父页面</th>
+            <th lay-data="{field:'edits',minWidth: 280,toolbar: '#barDemo'}">操作</th>
+        </tr>
+        </thead>
+        <!--/*@thymesVar id="menu" type="com.tsvico.pojo.Nav"*/-->
+        <tbody th:each="menu : ${menus}">
+        <tr>
+            <td th:text="${menu.menu_id}">ID</td>
+            <td th:text="${menu.menu_name}">名称</td>
+            <td th:text="${menu.menu_url}">地址</td>
+            <td th:text="${menu.parent_id==0?'':menus[menu.parent_id-1].menu_name}"></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <button type="button" class="layui-btn layui-btn-sm" lay-event="addNewDate">
+                <i class="layui-icon">&#xe608;</i> 添加
+            </button>
+        </div>
+    </script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn  layui-btn-primary layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>修改
+        </a>&nbsp;&nbsp;
+        <a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </script>
+</div>
+
+
+<div class="layui-row" id="zq_formpopbox" style="display:none;position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;" `>
+    <div class="layui-col-md11">
+        <form id="zq_form" class="layui-form" action="" style="margin-top: 20px;align:center;">
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">id</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" placeholder="请输入ID" name="menu_id"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">名称</label>
+                    <div class="layui-input-inline">
+                        <input type="text" required lay-verify="required" name="menu_name" placeholder="请输入名称"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否显示</label>
+                <div class="layui-input-inline">
+                    <select name="is_show" lay-verify="required">
+                        <option value="1">显示</option>
+                        <option value="0">隐藏</option>
+                    </select>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">
+                    图标
+                    <a href="https://www.layui.com/doc/element/icon.html#table" target="_blank" style="color: #d47070;">
+                        对照表</a>
+                </label>
+                <div class="layui-input-inline">
+                    <input type="text" name="menu_icon" required lay-verify="required" placeholder="请输入图标"
+                           autocomplete="off" value="layui-icon-radio"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">地址</label>
+                <div class="layui-input-inline">
+                    <input type="text" name="menu_url" required lay-verify="required" placeholder="请输入地址"
+                           autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">父级</label>
+                <div class="layui-input-inline">
+                    <select name="parent_id" lay-verify="required">
+                        <option value="0"></option>
+                        <option th:each="par:${parent}" th:value="${par.menu_id}" th:text="${par.menu_name}"></option>
+                    </select>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div th:replace="admin/_fragments::script"></div>
+<script src="/js/common.js"></script>
+<script>
+    var form;
+    layui.use(['table','form'], function () {
+        var table = layui.table;
+        form = layui.form;
+        //转换静态表格
+        var tabIns = table.init('mytable', {
+            limit: 13 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+            , page: true
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , id: 'tableId'
+            //支持所有基础参数
+        });
+
+
+        //头工具栏事件
+        table.on('toolbar(mytable)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'addNewDate':
+                    //添加行
+                    var oldData = table.cache['idmytable'];
+                    var lastId = oldData[oldData.length - 1].id;
+                    var newRow = {menu_id: parseInt(lastId) + 1, menu_name: '名称', menu_url: null, parent_id: '父页面'};
+                    oldData.push(newRow);
+                    console.log(oldData);
+                    table.reload('idmytable', {
+                        data: oldData
+                    });
+                    zq_form(newRow, '新增', 500, 500);
+                    break;
+            }
+        });
+        //监听工具条
+        table.on('tool(mytable)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            delete data.edits; //删除object多余项
+            if (obj.event === 'detail') {
+                layer.msg('ID：' + data.id + ' 的查看操作');
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: "/admin /permission/Delete",
+                        type: "POST",
+                        dataType: 'json',
+                        data: {id: data.id},
+                        success: function (msg) {
+                            var returnCode = msg.returnCode;
+                            if (returnCode === 200) {
+                                //删除这一行
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                layer.close(index);
+                                obj.del();
+                                layer.msg("删除失败", {icon: 5});
+                            }
+                        },
+                        error: function (e) {
+                            layer.close(index);
+                            layer.msg("删除失败", {icon: 5});
+                        }
+                    });
+                    return false;
+                });
+            } else if (obj.event === 'edit') {
+                if (obj.event === 'del') {
+                    layer.confirm('真的删除行么', function (index) {
+                        obj.del();
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'edit') {
+                    //console.debug(data);
+                    $.ajax({
+                        url: '/admin/permission/GetById',
+                        dataType: 'json',
+                        data: {menu_id:data.menu_id},
+                        success: function (msg) {
+                            console.log(msg);
+                            if (msg.code===200){
+                                var tdata = msg.data;
+                                tdata['menu_url'] = tdata['href'];// 删除原来的键
+                                delete tdata['href'];
+                                tdata['menu_icon'] = tdata['icon'];
+                                delete tdata['icon'];
+                                tdata['menu_name'] = tdata['title'];
+                                delete tdata['title'];
+                                zq_form(tdata, '编辑', 500, 500);
+                            }else {
+                                layer.msg(msg.error);
+                            }
+                        }
+                    })
+
+
+                }
+            }
+        });
+
+
+    });
+
+    var index;//layer.open 打开窗口后的索引，通过layer.close(index)的方法可关闭
+    function zq_form(data, title, w, h) {
+        if (title == null || title === '') {
+            title = false;
+        }
+        if (w == null || w === '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h === '') {
+            h = ($(window).height() - 50);
+        }
+        var layer = layui.layer;
+        index = layer.open({  //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+            type: 1,
+            title: title,
+            area: ['30%', '80%'],//类型：String/Array，默认：'auto'  只有在宽高都定义的时候才不会自适应
+            // area: [w+'px', h +'px'],
+            fix: false, //不固定
+            maxmin: true,//开启最大化最小化按钮
+            shadeClose: true,//点击阴影处可关闭
+            shade: 0.4,//背景灰度
+            content: $('#zq_formpopbox'),
+            success: function (layero, index) {
+                $('#zq_form').setForm(data, layero);
+                form.render('select');
+                if (!isNaN(data.menu_id)) {
+                    console.log(true);
+                    $('input[name="menu_id"]').addClass("layui-disabled");
+                    $('input[name="menu_id"]').attr("readonly", "readonly");
+                    //layero.find("input[name='"+data.menu_id+"']").attr("disabled","disabled");
+                    //layero.find("[name='"+data.menu_id+"']").val("3123131")
+                } else {
+                    $('input[name="menu_id"]').removeClass("layui-disabled");
+                    $('input[name="menu_id"]').removeAttr("readonly")
+                }
+            },
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                //var t = $(layero.find("#zq_form"));
+                var data = getOpenFrom(layero, '#zq_form');
+                console.log(data);
+                $.ajax({
+                    url: "/admin/permission/update",
+                    type: "POST",
+                    dataType: 'json',
+                    data: data,
+                    success: function (msg) {
+                        var returnCode = msg.returnCode;
+                        if (returnCode === 200) {
+                            layer.close(index);
+                            layer.msg("更新成功", {icon: 6});
+                            parent.location.reload(); //刷新父窗口
+                        } else {
+                            layer.close(index);
+                            layer.msg("更新失败", {icon: 5});
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<html lang="cn">
+<title>后台登录</title>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css"/>
+<link rel="stylesheet" type="text/css" href="css/login.css">
+<script type="application/javascript" src="https://www.layuicdn.com/layui/layui.js"></script>
+<script src="https://cdn.bootcss.com/blueimp-md5/2.12.0/js/md5.min.js"></script>
+<body>
+<form class="layui-form" lay-filter="myform" action="getUser" method="post">
+    <div class="container">
+        <button type="button" class="close" title="关闭">X</button>
+        <div class="layui-form-mid layui-word-aux">
+            <img id="logoid"
+                 src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJEAAAAuCAYAAAAoRPuDAAAVjElEQVR4Ae3bVcxkxRIH8F5Y3N3d3d3dNYRAkCCBwAPwADwQEniBIAkhITxBggaCa3B3d3d3d2dvfhVqb++5Z76Z3ZlvE26mkrNn5kx3dcm/pPt8O2bcuHHjypCGFujDAlP0MXc4dWiBsMAQREMg9G2BIYj6NuGQwRBEQwz0bYEhiPo24ZDBEERDDPRtgSGI+jbhkMHYyWGCzz//vPz6669lhhlmKHPMMcfkWLL8/fff5aeffipffvll+fPPP8vYsWPLtNNOW2abbbYy9dRTlymmGGz8fPvtt+W3334L3caMGVN++OGHMvPMM8c1zTTTTBadLeLY76+//io//vhjyMAOM800U5l99tlHTYZRAxHhOc/9pptuKm+//XZZYYUVyu677x4OZGgKu3Oo+6AoAfTcc8+Vq666qnz99dcBnsUWW6xsu+22ZaGFFirTTTfdwIBkvccee6y88847wRNgH3nkkbLRRhuV9ddfvyyyyCJlyimnHNh6aac8J3YngzubA9CTTz4ZMgD2uuuuW7bffvuQYTTsPWY0TqxlgJdeeqncfPPN5cMPPyyi9Pfffw/HLbDAAmWttdaK6DBurrnmKquvvnqZddZZ0zZ93RnxzTffLLfeemt56qmnyjfffBORyYkykGy45pprls0337wss8wy8ayfBf/444/y2muvlYsuuqi89dZbwYqjfv755zL99NPHZZ2tttoq9B5UsNDTGkAi07P3Cy+8UD7++OMA1C+//BK/Axad55xzzrLccsuVFVdcMfSed955+1F7grl9g0iUf/LJJ+WLL74I5ylbIuHTTz8t7733XpSUjBgGnGqqqco888wTd4ag4GqrrVYOOOCAvrORzPPss8+WV155Jdb+7rvvyqKLLloA11qcTC4l1TN38iDZY+655y6rrLJKZMwJrNThC72A9Oyzzy7W/v7771tHKmvkWHzxxcsSSywRNuHE9dZbb6Kz02233VZef/31AiQuGQiYyPHVV1+F7ZtCsLsgUsrprLQJWiAnE53pPqnUczkjrIxCUA5BypAULgoSNCJD1skxtWCM7rcPPvggHjOuce+//34YYlJKDEOKPsDhyDfeeCMiE1+GU05EH6ADPDndGb3OCsYysPuyyy4b91r2ts96D0B98cUXo/9o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"
+                 height="35">
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">用户名</label>
+            <div class="layui-input-block">
+                <input type="text" name="username" required lay-verify="required" placeholder="请输入用户名"
+                       autocomplete="off"
+                       class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">密 &nbsp;&nbsp;码</label>
+            <div class="layui-input-inline">
+                <input type="password" name="password" required lay-verify="required" placeholder="请输入密码"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <!-- <div class="layui-form-mid layui-word-aux">辅助文字</div> -->
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">验证码</label>
+            <div class="layui-input-inline" style="width: auto;">
+                <input type="text" name="verifyCodeActual" required lay-verify="required" placeholder="请输入验证码"
+                       autocomplete="off"
+                       class="layui-input verity">
+            </div>
+            <div class="layui-inline layui-anim layui-anim-fadein">
+                <img class="img" src="/kaptcha" alt="">
+            </div>
+            <!-- <div class="layui-form-mid layui-word-aux">辅助文字</div> -->
+
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">记住密码</label>
+            <div class="layui-input-block">
+                <input type="checkbox" id="remember" lay-filter="switchTest" lay-skin="switch" checked>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <div class="layui-input-block">
+                <button class="layui-btn" lay-submit lay-filter="formSubmit">登陆</button>
+            </div>
+        </div>
+        <a href="" class="font-set">忘记密码?</a> <a href="" class="font-set">申请账号</a>
+    </div>
+</form>
+
+<script>
+    layui.use(['form'], function () {
+        var form = layui.form;
+        var remember;
+        //自定义验证规则
+        form.verify({
+            title: function (value) {
+                if (value.length < 5) {
+                    return '用户名至少5位';
+                }
+            }
+            , pass: [
+                /^[\S]{6,12}$/
+                , '密码必须6到12位，且不能出现空格'
+            ]
+            , content: function (value) {
+                layedit.sync(editIndex);
+            }
+        });
+
+        remember = localStorage.getItem("remember") || 'false';
+        if (remember === "true") {
+            //给表单赋值
+            form.val("myform", {
+                "username": localStorage.getItem("username") // "name": "value"
+                , "password": localStorage.getItem("password")
+            });
+            $('#remember').prop("checked", true);
+        } else {
+            $('#remember').prop("checked", false);
+        }
+        form.render(); //重新渲染
+
+        //监听指定开关
+        form.on('switch(switchTest)', function (data) {
+            layer.msg('开启状态：' + (this.checked ? 'true' : 'false'), {
+                offset: '6px'
+            });
+            //todo 记住密码(存储在cookie不安全)
+            localStorage.setItem("remember", data.elem.checked);
+        });
+
+        //监听提交
+        form.on('submit(formSubmit)', function (data) {
+            var da = data.field;
+            remember = localStorage.getItem("remember") || 'false';
+            if (data.field.password.length < 32) {
+                if (remember === "true") {
+                    localStorage.setItem("username", da.username);
+                    localStorage.setItem("password", md5(da.password));
+                    localStorage.setItem("remember", "true");
+                }
+                data.field.password = md5(da.password);
+            }
+            if (remember === "false") {
+                localStorage.removeItem("username");
+                localStorage.removeItem("password");
+                localStorage.setItem("remember", "false");
+            }
+            console.log(data);
+            $.ajax({
+                url: data.form.action,
+                data: data.field,
+                type: 'POST',
+                dataType: "json",
+                success: function (res) {
+                    console.log(res);
+                    if (res.code === 0) {
+                        //验证码
+                        $('.img').click();
+                        layer.msg(res.message);
+                    } else if (res.code === 1) {
+                        //成功
+                        layer.msg(res.message);
+                        window. location.href = "/admin"; //跳转到登录首页
+                    } else {
+                        layer.msg(res.message);
+                    }
+                }
+            });
+            return false;//阻止表单默认提交
+        });
+    });
+    $(".img").bind("click", function () {
+        $(this).hide().attr('src', '/kaptcha?' + Math.random()).fadeIn();
+    });
+
+    $('.close').click(function () {
+        if (navigator.userAgent.indexOf("Firefox") != -1 || navigator.userAgent.indexOf("Chrome") !=-1) {
+            window.location.href="about:blank";
+            window.close();
+        } else {
+            window.opener = null;
+            window.open("", "_self");
+            window.close();
+        }
+    })
+</script>
+<script>
+    $('.button-register').click(function () {
+        layer.msg('这里没有添加任何功能');
+    })
+</script>
+</body>
+</html>
