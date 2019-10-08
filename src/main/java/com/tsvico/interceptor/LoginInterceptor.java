@@ -19,22 +19,6 @@ public class LoginInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         HttpSession session = request.getSession(); //获取session
         User user = (User) session.getAttribute("user");
-        /*List<Nav> menus = (List<Nav>) session.getAttribute("menus");*/
-        /*String url = request.getRequestURI();
-        if (menus!=null){
-            for (Nav menu:menus){
-                if (menu.getMenu_url().contains(url)){
-                    if (user.getRole_id()<=menu.getRole_id()){
-                        //没事
-                    }else {
-                        response.setStatus(404);
-                        return false;
-                    }
-                    break;
-                }
-            }
-        }
-        */
         //判断session中是否有用户数据，如果有，则返回true，继续向下执行
         if (user != null) {
             return true;
