@@ -1,5 +1,7 @@
 package com.tsvico.pojo;
 
+import java.util.Date;
+
 /**
  * @author tsvico
  * @email tsxygwj@gmail.com
@@ -9,6 +11,9 @@ public class User {
     private int uid;
     private String uname;
     private String upassword;
+    private String unickname;
+    private int uphone;
+    private Date ubirthday;
     private int uage;
     private String avater;
     private String email;
@@ -40,6 +45,22 @@ public class User {
         this.upassword = upassword;
     }
 
+    public String getUnickname() {
+        return unickname;
+    }
+
+    public void setUnickname(String unickname) {
+        this.unickname = unickname;
+    }
+
+    public int getUphone() {
+        return uphone;
+    }
+
+    public void setUphone(int uphone) {
+        this.uphone = uphone;
+    }
+
     public void setUname(String uname) {
         this.uname = uname;
     }
@@ -54,6 +75,14 @@ public class User {
 
     public String getAvater() {
         return avater;
+    }
+
+    public Date getUbirthday() {
+        return ubirthday;
+    }
+
+    public void setUbirthday(Date ubirthday) {
+        this.ubirthday = ubirthday;
     }
 
     public void setAvater(String avater) {
@@ -98,11 +127,15 @@ public class User {
                 "uid=" + uid +
                 ", uname='" + uname + '\'' +
                 ", upassword='" + upassword + '\'' +
+                ", unickname='" + unickname + '\'' +
+                ", uphone=" + uphone +
+                ", ubirthday=" + ubirthday +
                 ", uage=" + uage +
                 ", avater='" + avater + '\'' +
                 ", email='" + email + '\'' +
                 ", depart=" + depart +
                 ", position=" + position +
+                ", role_id=" + role_id +
                 '}';
     }
 }

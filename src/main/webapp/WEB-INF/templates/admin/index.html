@@ -51,7 +51,7 @@
 						<a href="javascript:" class="clearCache"><i class="layui-icon" data-icon="&#xe640;">&#xe640;</i><cite>清除缓存</cite><span class="layui-badge-dot"></span></a>
 					</li>
 					<li class="layui-nav-item" id="userInfo">
-						<a href="javascript:"><img src="images/face.jpg" th:src="${session.user.avater}" class="layui-nav-img userAvatar" width="35" height="35"><cite class="adminName" th:text="${session.user.uname}">是是是</cite></a>
+						<a href="javascript:"><img src="images/face.jpg" th:src="${session.user.avater}" class="layui-nav-img userAvatar" width="35" height="35"><cite class="adminName" th:text="${session.user.unickname}">是是是</cite></a>
 						<dl class="layui-nav-child">
 							<dd><a href="javascript:" data-url="/admin/page/userInfo"><i class="seraph layui-icon layui-icon-face-surprised" data-icon="icon-ziliao"></i><cite>个人资料</cite></a></dd>
 							<dd><a href="javascript:" data-url="page/user/changePwd.html"><i class="seraph layui-icon layui-icon-password" data-icon="icon-xiugai"></i><cite>修改密码</cite></a></dd>
@@ -70,7 +70,7 @@
 		<div class="layui-side layui-bg-black">
 			<div class="user-photo">
 				<a class="img" title="我的头像" ><img src="images/face.jpg" th:src="${session.user.avater}" class="userAvatar"></a>
-				<p>你好！<span class="userName" th:text="${session.user.uname}">saw</span>, 欢迎登录</p>
+				<p>你好！<span class="userName" th:text="${session.user.unickname}">saw</span>, 欢迎登录</p>
 			</div>
 			<!-- 搜索 -->
 			<div class="layui-form component">
