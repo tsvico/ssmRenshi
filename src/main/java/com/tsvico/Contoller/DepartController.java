@@ -34,12 +34,22 @@ public class DepartController {
         binder.registerCustomEditor(Date.class, new CustomDateEditor(new SimpleDateFormat("yyyy-MM-dd"), true));
     }
 
+    /**
+     * 部门管理页面 该页面地址为 admin/page/depart
+     * @param model
+     * @return
+     */
     @RequestMapping()
     public String getDepart(Model model){
         model.addAttribute("tables",departService.getAll());
         return "admin/page/depart";
     }
 
+    /**
+     * 删除部门 接口地址 admin/page/depart/Delete
+     * @param id
+     * @return
+     */
     @PostMapping(value = "/Delete",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String delete(String id){
@@ -68,6 +78,11 @@ public class DepartController {
         return jsonObject.toJSONString();
     }
 
+    /**
+     * 更新或新增部门(通过设置唯一主键可以实现数据库无则新增，有则更新)
+     * @param department
+     * @return
+     */
     @PostMapping(value = "/update",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String update(Department department){

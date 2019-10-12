@@ -34,7 +34,7 @@ public interface ConfigDao {
                             fetchType= FetchType.EAGER)
             )
     })
-    List<Nav> getAllNav(); //TODO 要传入user的
+    List<Nav> getAllNav(); //TODO 要传入user的,根据用户权限等级来返回不同的前端页面
 
     @Select("select * from menu where parent_id = #{parent_id} and is_show = 1")
     List<Nav> getChild(int parent_id);

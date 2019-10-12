@@ -12,9 +12,17 @@ import javax.servlet.http.HttpSession;
  * @author tsvico
  * @email tsxygwj@gmail.com
  * @time 2019/9/20 14:05
- * 功能
+ * 功能 SSM中的拦截器，在spring-web.xml文件中配置该包路径
  */
 public class LoginInterceptor implements HandlerInterceptor {
+    /**
+     * 重写preHandle方法，拦截未登录用户访问 /admin 路径
+     * @param request
+     * @param response
+     * @param o
+     * @return
+     * @throws Exception
+     */
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         HttpSession session = request.getSession(); //获取session

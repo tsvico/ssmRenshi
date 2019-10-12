@@ -33,22 +33,21 @@ public class UserController {
     private PositionServiceImpl positionService;
 
     @Value("${salt}")
-    public String salt; //获取加盐
-
-    @Value("${Adminuser}")
-    public String defaultUser;
-    @Value("${Adminpassword}")
-    public String defaultPassword;
+    public String salt; //获取加盐  //对密码二次加密的字段
 
     @RequestMapping("/")
     public String index(){
-        User user = userService.getUser(defaultUser);
-        if (user==null){
-            //TODO 插入一个管理员
-        }
         return "login";
     }
 
+    /**
+     * 验证用户名以及密码 验证码
+     * @param username
+     * @param password
+     * @param request
+     * @param session
+     * @return json数据
+     */
     @RequestMapping(value = "/getUser",produces = " text/html;charset=UTF-8")
     @ResponseBody
     public String getUser(@RequestParam("username") String username,
@@ -62,7 +61,7 @@ public class UserController {
             return jsonDate.toJSONString();
         }
         System.out.println(username+password);
-        User user1 = userService.checkUser(username, MD5Utils.code(password+salt));
+        User user1 = userService.checkUser(username, MD5Utils.code(password+salt)); //校验密码
         if (user1!=null){
             jsonDate.put("code",1);
             jsonDate.put("message","验证通过");
@@ -73,6 +72,12 @@ public class UserController {
         }
         return jsonDate.toJSONString();
     }
+
+    /**
+     * 用户登出
+     * @param session
+     * @return
+     */
     @RequestMapping("/logout")
     public String logout(HttpSession session){
         if (session.getAttribute("user")!=null)
@@ -80,6 +85,12 @@ public class UserController {
         return "redirect:/";
     }
 
+    /**
+     * 用户管理  - 页面
+     * @param model
+     * @param session
+     * @return
+     */
     @GetMapping("/admin/page/user")
     public String getUser(Model model,HttpSession session){
         User user = (User) session.getAttribute("user");
@@ -89,12 +100,19 @@ public class UserController {
         model.addAttribute("roles",positionService.getAllRole());
         return "admin/page/ManageUsers";
     }
+
+    /**
+     * 通过ID获取用户信息
+     * @param id
+     * @param session
+     * @return
+     */
     @GetMapping(value = "/admin/page/user/getUserById",produces =  "application/json;charset=UTF-8")
     @ResponseBody
     public String getUserById(int id,HttpSession session){
         User user = (User) session.getAttribute("user");
         JSONObject res = new JSONObject();
-        //TODO 低级权限管理
+        //TODO 权限管理
         if (user.getRole_id()==1){
            res.put("resCode",200);
            res.put("data",userService.getUserById(id));
@@ -104,6 +122,12 @@ public class UserController {
         res.put("message","权限不足");
         return res.toJSONString();
     }
+
+    /**
+     * 根据ID删除用户
+     * @param ids
+     * @return
+     */
     @DeleteMapping(value = "/admin/page/user/Delete",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String delete(@RequestParam("id") String ids){
@@ -132,6 +156,12 @@ public class UserController {
         return jsonObject.toJSONString();
     }
 
+    /**
+     * 更新用户信息
+     * @param user
+     * @param session
+     * @return
+     */
     @PostMapping(value = "/admin/page/user/update",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String update(User user,HttpSession session){
@@ -158,10 +188,16 @@ public class UserController {
         return jsonObject.toJSONString();
     }
 
+    /**
+     * 个人资料修改页面
+     * @param session
+     * @param model
+     * @return
+     */
     @RequestMapping("/admin/page/userInfo")
     public String userInfo(HttpSession session,Model model){
         User user = (User) session.getAttribute("user");
-        //session存储的User没有关联表，这里需要去Dao从新取出
+        //session存储的User没有关联表，这里需要去Dao重新取出
         model.addAttribute("user",userService.getUserById(user.getUid()));
         return "admin/page/user/userInfo";
     }

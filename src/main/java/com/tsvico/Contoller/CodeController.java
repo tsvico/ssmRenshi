@@ -23,6 +23,13 @@ import java.awt.image.BufferedImage;
 public class CodeController {
     @Autowired
     private Producer captchaProducer = null;
+
+    /**
+     * 验证码请求接口，每次请求会获得新验证码
+     * @param request
+     * @param response
+     * @throws Exception
+     */
     @RequestMapping("/kaptcha")
     public void getKaptchaImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
         HttpSession session = request.getSession();
