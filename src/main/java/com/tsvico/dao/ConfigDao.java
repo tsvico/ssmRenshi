@@ -16,6 +16,10 @@ import java.util.List;
 @Repository
 public interface ConfigDao {
 
+    /**
+     *
+     * @return
+     */
     @Select("select * from menu where parent_id = 0 and is_show = 1")
     @Results({
             @Result(id=true,column="menu_id",property="menu_id"), //列和属性相同可以省略???

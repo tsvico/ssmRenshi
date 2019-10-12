@@ -154,10 +154,10 @@
             } else if (obj.event === 'del') {
                 layer.confirm('真的删除行么', function (index) {
                     $.ajax({
-                        url: "/admin /permission/Delete",
+                        url: "/admin/permission/Delete",
                         type: "POST",
                         dataType: 'json',
-                        data: {id: data.id},
+                        data: {id: data.menu_id},
                         success: function (msg) {
                             var returnCode = msg.returnCode;
                             if (returnCode === 200) {
