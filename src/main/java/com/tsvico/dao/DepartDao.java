@@ -17,10 +17,10 @@ import java.util.List;
 @Repository
 public interface DepartDao {
 
-    @Select("select * from Department")
+    @Select("select * from department")
     List<Department> getAllDepart();
 
-    @Select("select * from Department where dept_id=#{id}")
+    @Select("select * from department where dept_id=#{id}")
     Department selectDeptById(int id);
 
     @Delete("DELETE FROM `department` WHERE `dept_id`=#{id,jdbcType=INTEGER}")
