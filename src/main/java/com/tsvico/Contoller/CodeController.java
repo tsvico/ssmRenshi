@@ -26,9 +26,9 @@ public class CodeController {
 
     /**
      * 验证码请求接口，每次请求会获得新验证码
-     * @param request
-     * @param response
-     * @throws Exception
+     * @param request 请求头
+     * @param response 响应头
+     * @throws Exception 图片IO异常
      */
     @RequestMapping("/kaptcha")
     public void getKaptchaImage(HttpServletRequest request, HttpServletResponse response) throws Exception {
