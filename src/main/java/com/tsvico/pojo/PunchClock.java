@@ -10,7 +10,7 @@ import java.util.Date;
  */
 public class PunchClock {
     private Integer id;//标识
-    private int uid;//用户ID
+    private Integer uid;//用户ID
     private Date punch_inTime;//打卡时间
     private Date punch_outTime;//签退时间
     private Date attendanceTime;//考勤时间
@@ -27,11 +27,11 @@ public class PunchClock {
         this.id = id;
     }
 
-    public int getUid() {
+    public Integer getUid() {
         return uid;
     }
 
-    public void setUid(int uid) {
+    public void setUid(Integer uid) {
         this.uid = uid;
     }
 

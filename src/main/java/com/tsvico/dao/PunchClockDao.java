@@ -22,10 +22,10 @@ public interface PunchClockDao {
      * @param punchClock
      * @return
      */
-    @Update("update sys_userpunchclock set " +
+    @Update("update punchclock set " +
             "punch_outTime=#{punch_outTime} " +
             "where " +
-            "attendanceTime=#{attendanceTime} and userid=#{userid}")
+            "attendanceTime=#{attendanceTime} and uid=#{uid}")
     int up_out(PunchClock punchClock);
 
     /**
@@ -33,8 +33,8 @@ public interface PunchClockDao {
      * @param punchClock
      * @return
      */
-    @Insert("insert into sys_userpunchclock(id,userid,developername,punch_inTime,attendanceTime,userip,loginaddress) " +
-            "values(null,#{userid},#{developername},#{punch_inTime},#{attendanceTime},#{userip},#{loginaddress}")
+    @Insert("insert into punchclock(id,uid,developername,punch_inTime,attendanceTime,userip,loginaddress) " +
+            "values(null,#{uid},#{developername},#{punch_inTime},#{attendanceTime},#{userip},#{loginaddress}")
     int add_in(PunchClock punchClock);
 
 
@@ -43,8 +43,8 @@ public interface PunchClockDao {
      * @param punchClock
      * @return
      */
-    @Update("update sys_userpunchclock set " +
-            "remark=#{remark} where attendanceTime=#{attendanceTime} and userid=#{userid}\n")
+    @Update("update punchclock set " +
+            "remark=#{remark} where attendanceTime=#{attendanceTime} and uid=#{uid}")
     int late_result(PunchClock punchClock);
 
 
@@ -53,7 +53,7 @@ public interface PunchClockDao {
      * @param punchClock
      * @return
      */
-    @Select("select punch_inTime from sys_userpunchclock where attendanceTime=#{attendanceTime} and userid=#{userid}")
+    @Select("select punch_inTime from punchclock where attendanceTime=#{attendanceTime} and uid=#{uid}")
     PunchClock if_punchin(PunchClock punchClock);
 
 
@@ -62,7 +62,7 @@ public interface PunchClockDao {
      * @param punchClock
      * @return
      */
-    @Select("select punch_outTime from sys_userpunchclock where attendanceTime=#{attendanceTime} and userid=#{userid}")
+    @Select("select punch_outTime from punchclock where attendanceTime=#{attendanceTime} and uid=#{uid}")
     PunchClock if_punchout(PunchClock punchClock);
 
     /**

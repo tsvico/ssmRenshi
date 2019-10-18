@@ -38,7 +38,7 @@
                        class="layui-input verity">
             </div>
             <div class="layui-inline layui-anim layui-anim-fadein">
-                <img class="img" src="/kaptcha" alt="">
+                <img class="img" src="/kaptcha" alt="验证码" title="点击刷新验证码">
             </div>
             <!-- <div class="layui-form-mid layui-word-aux">辅助文字</div> -->
 
@@ -130,6 +130,7 @@
                         //验证码
                         $('.img').click();
                         layer.msg(res.message);
+                        $("input[name='verifyCodeActual']").val(""); //清空验证码框
                     } else if (res.code === 1) {
                         //成功
                         layer.msg(res.message);
