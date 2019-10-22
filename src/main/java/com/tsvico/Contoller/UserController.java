@@ -36,7 +36,11 @@ public class UserController {
     public String salt; //获取加盐  //对密码二次加密的字段
 
     @RequestMapping("/")
-    public String index(){
+    public String index(HttpSession session){
+        if (session.getAttribute("user")!=null){
+            User user = (User)session.getAttribute("user");
+            return "redirect:/admin";
+        }
         return "login";
     }
 
@@ -86,7 +90,7 @@ public class UserController {
     }
 
     /**
-     * 用户管理  - 页面
+     * 用户管理(在职)  - 页面
      * @param model
      * @param session
      * @return
@@ -101,6 +105,21 @@ public class UserController {
         return "admin/page/ManageUsers";
     }
 
+    /**
+     * 用户管理(离职)  - 页面
+     * @param model
+     * @param session
+     * @return
+     */
+    @GetMapping("/admin/page/leaveUser")
+    public String leaveUser(Model model,HttpSession session){
+        User user = (User) session.getAttribute("user");
+        model.addAttribute("users",userService.getLevelAll(user));
+        model.addAttribute("departs",departService.getAll());
+        model.addAttribute("positions",positionService.getAll());
+        model.addAttribute("roles",positionService.getAllRole());
+        return "admin/page/emTurnUser";
+    }
     /**
      * 通过ID获取用户信息
      * @param id
@@ -125,23 +144,30 @@ public class UserController {
 
     /**
      * 根据ID删除用户
-     * @param ids
+     * @param id
      * @return
      */
-    @DeleteMapping(value = "/admin/page/user/Delete",produces = "application/json;charset=UTF-8")
+    @DeleteMapping(value = "/admin/page/user/{id}/Delete",produces = "application/json;charset=UTF-8")
     @ResponseBody
-    public String delete(@RequestParam("id") String ids){
+    public String delete(@PathVariable String id){
         JSONObject jsonObject = new JSONObject();
-        int id;
-        if (ids == null){
+        int ids;
+        if (id == null){
             jsonObject.put("returnCode",0);
             jsonObject.put("mesage","请传入数据");
             return jsonObject.toJSONString();
         }
         try{
-            id = Integer.parseInt(ids);
-            int res = userService.deleteUser(id);
-            if (res>0){
+            ids = Integer.parseInt(id);
+            User user = userService.getUserById(ids);
+            int res;
+            if (user.getStatus()==0){
+                res = userService.deleteUser(ids);
+            }else {
+                user.setStatus(0); //设置为离职
+                res = userService.updateUser(user);
+            }
+            if (res!=0){
                 jsonObject.put("returnCode",200);
                 jsonObject.put("message","删除成功");
             }else {

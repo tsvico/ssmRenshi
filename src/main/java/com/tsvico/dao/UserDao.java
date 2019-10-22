@@ -44,14 +44,39 @@ public interface UserDao {
     //此处表ID要增加Unique索引 参考语句 ALTER TABLE `TableName` ADD unique(`id`);
     //存在则更新,影响记录条数2   不存在则插入,影响记录条数1
     @Insert("insert INTO users" +
-            "(uid, uname, upassword, uage,avater,email,dept_id,position_id,role_id) " +
-            "VALUES (#{uid},#{uname},#{upassword},#{uage},#{avater},#{email},#{depart.dept_id},#{position.position_id},#{role_id}) " +
+            "(uid, uname, upassword,unickname,status,uage,avater,email,dept_id,position_id,role_id) " +
+            "VALUES (#{uid},#{uname},#{upassword},#{unickname},#{status},#{uage},#{avater},#{email},#{depart.dept_id},#{position.position_id},#{role_id}) " +
             "ON DUPLICATE KEY " +
             "UPDATE " +
-            "uname=#{uname},upassword=#{upassword},uage=#{uage},avater=#{avater},email=#{email},dept_id=#{depart.dept_id},position_id=#{position.position_id},role_id=#{role_id}")
+            "uname=#{uname},upassword=#{upassword},unickname=#{unickname},status=#{status},uage=#{uage},avater=#{avater},email=#{email},dept_id=#{depart.dept_id},position_id=#{position.position_id},role_id=#{role_id}")
     Integer insertUser(User user);
 
-    @Select("select * from users where role_id > #{role_id}")
+    @Select("select * from users where role_id > #{role_id} and status = 1")
+    @Results({
+            @Result(id=true,column="uid",property="uid"), //列和属性相同可以省略???
+            @Result(column="uname",property="uname"),
+            @Result(column="unickname",property="unickname"),
+            @Result(column="upassword",property="upassword"),
+            @Result(column="uage",property="uage"),
+            @Result(column = "avater",property = "avater"),
+            @Result(column = "email",property = "email"),
+            @Result(column="dept_id",property="depart",
+                    one=@One(
+                            select="com.tsvico.dao.DepartDao.selectDeptById",
+                            fetchType= FetchType.EAGER
+                    )),
+            @Result(column="position_id",property="position",
+                    one=@One(
+                            select="com.tsvico.dao.PositionDao.selectPositionByid",
+                            fetchType= FetchType.EAGER
+                    )),
+    })
+    List<User> getAllUser(User user);
+
+    /**
+     * 离职员工
+     */
+    @Select("select * from users where role_id > #{role_id} and status = 0")
     @Results({
             @Result(id=true,column="uid",property="uid"), //列和属性相同可以省略???
             @Result(column="uname",property="uname"),
@@ -70,5 +95,5 @@ public interface UserDao {
                             fetchType= FetchType.EAGER
                     )),
     })
-    List<User> getAllUser(User user);
+    List<User> getlevelUser(User user);
 }

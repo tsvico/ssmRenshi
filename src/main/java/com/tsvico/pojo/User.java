@@ -17,6 +17,7 @@ public class User {
     private int uage;
     private String avater;
     private String email;
+    private int status;
     //外键
     //private int dept_id;
     //private int position_id;
@@ -111,6 +112,14 @@ public class User {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public int getRole_id() {

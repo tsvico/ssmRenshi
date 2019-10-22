@@ -42,6 +42,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<User> getLevelAll(User user) {
+        return userDao.getlevelUser(user);
+    }
+
+    @Override
     public int deleteUser(int id) {
         return userDao.delect(id);
     }

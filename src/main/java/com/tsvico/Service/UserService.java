@@ -15,6 +15,7 @@ public interface UserService {
     User getUserById(int id);
     User checkUser(String username, String password);
     List<User> getAll(User user);
+    List<User> getLevelAll(User user);
     int deleteUser(int id);
     int updateUser(User user);
 }
