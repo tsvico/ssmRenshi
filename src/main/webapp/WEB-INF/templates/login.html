@@ -138,8 +138,10 @@
                     } else {
                         layer.msg(res.message);
                     }
-                },error:function () {
-                    layer.msg("登录失败");
+                },error: function (e) {
+                    layer.close(index);
+                    console.log(e);
+                    layer.msg("登录失败", {icon: 5});
                 }
             });
             return false;//阻止表单默认提交

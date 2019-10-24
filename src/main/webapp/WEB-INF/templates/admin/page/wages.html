@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="cn" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/_fragments::head">
+</head>
+<body>
+<div class="layui-main">
+    <table lay-even class="layui-table layui-hide" lay-filter="mytable" lay-data="{id: 'idmytable'}">
+        <thead>
+        <tr>
+            <th lay-data="{field:'wages_id', width:50}">ID</th>
+            <th lay-data="{field:'uid', width:90}">员工编号</th>
+            <th lay-data="{field:'nickname', width:125}">姓名</th>
+            <th lay-data="{field:'wages_time', width:110}">工资年月</th>
+            <th lay-data="{field:'basic_wage', width:90}">基本工资</th>
+            <th lay-data="{field:'bonus', width:75}">奖金</th>
+            <th lay-data="{field:'allowance', width:75}">津贴</th>
+            <th lay-data="{field:'hj', width:75}">合计</th>
+            <th lay-data="{field:'attendance', width:75}">考勤减</th>
+            <th lay-data="{field:'sj', width:110,sort: true}">实际工资</th>
+            <th lay-data="{field:'zt', width:80,sort: true}">状态</th>
+            <th lay-data="{field:'edits',minWidth: 150,toolbar: '#barDemo'}">操作</th>
+        </tr>
+        </thead>
+        <tbody th:each="wage : ${wages}">
+        <tr th:with="hj=${wage.basic_wage + wage.bonus + wage.allowance}"> <!--/*定义局部变量 合计薪资*/-->
+
+            <!--/*@thymesVar id="wage" type="com.tsvico.pojo.Wages"*/-->
+            <td th:text="${wage.wages_id}"></td>
+            <td th:text="${wage.uid}"></td>
+            <td th:text="${wage.user.unickname}">姓名</td>
+            <td th:text="${#dates.format(wage.wages_time,'yyyy年MM月')}"></td>
+            <td th:text="${wage.basic_wage}"></td>
+            <td th:text="${wage.bonus}">66</td>
+            <td th:text="${wage.allowance}"></td>
+            <td th:text="${hj}">合计薪资</td>
+            <td th:text="${wage.attendance}">考勤</td>
+            <td th:text="${hj - wage.attendance}">实际薪资</td>
+            <td th:utext="${wage.user.status==1?'在职':'<b>离职</b>'}"></td>
+            <td></td>
+        </tr>
+        </tbody>
+    </table>
+    <script type="text/html" id="toolbarDemo">
+        <div class="layui-btn-container">
+            <div th:if="${session.user.role_id==1}">
+                <button type="button" class="layui-btn layui-btn-sm" lay-event="addNewDate">
+                    <i class="layui-icon">&#xe608;</i> 添加
+                </button>
+            </div>
+            <div class="layui-btn layui-btn-sm">
+                <input type="text" placeholder="筛选姓名" name="search">
+            </div>
+            <button class="layui-btn layui-btn-sm layui-icon" lay-event="search">&#xe615;</button>
+        </div>
+    </script>
+    <script type="text/html" id="barDemo">
+        <a class="layui-btn  layui-btn-primary layui-btn-xs" lay-event="edit">
+            <i class="layui-icon layui-icon-edit"></i>修改
+        </a>&nbsp;&nbsp;
+        <a class="layui-btn  layui-btn-danger layui-btn-xs" lay-event="del">
+            <i class="layui-icon layui-icon-delete"></i>删除
+        </a>
+    </script>
+</div>
+
+
+<div class="layui-row" id="zq_formpopbox" style="display:none;position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;" `>
+    <div class="layui-col-md11">
+        <form id="zq_form" class="layui-form" action="" style="margin-top: 20px;align:center;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">id</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" placeholder="请输入ID,不可重复" name="wages_id"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">员工名称</label>
+                    <div class="layui-input-inline">
+                        <select name="uid" lay-verify="required">
+                            <!--/*@thymesVar id="users" type="com.tsvico.pojo.User"*/-->
+                            <option th:each="user:${users}" th:value="${user.uid}" th:text="${user.unickname}"></option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">工资年月</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="time_poped" name="wages_time" required lay-verify="required" placeholder="工资年月" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">基础工资</label>
+                    <div class="layui-input-inline">
+                        <input type="text" required lay-verify="required" name="basic_wage" placeholder="基础工资"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">奖金</label>
+                    <div class="layui-input-inline">
+                        <input type="text" required lay-verify="required" name="bonus" placeholder="奖金"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">津贴</label>
+                    <div class="layui-input-inline">
+                        <input type="text" required lay-verify="required" name="allowance" placeholder="津贴"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div th:replace="admin/_fragments::script"></div>
+<script src="/js/common.js"></script>
+<script>
+    var form;
+    layui.use(['table', 'laydate', 'form'], function () {
+        var table = layui.table;
+        form = layui.form;
+        //转换静态表格
+        var tabIns = table.init('mytable', {
+            limit: 10 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+            , page: true
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , id: 'tableId'
+            //支持所有基础参数
+        });
+
+
+        //头工具栏事件
+        table.on('toolbar(mytable)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'addNewDate':
+                    //添加行
+                    var oldData = table.cache['idmytable'];
+                    var lastId = oldData[oldData.length - 1].wages_id;
+                    var newRow = {wages_id: parseInt(lastId) + 1, uid: 1, nickname: null, wages_time: '2019年10月'};
+                    oldData.push(newRow);
+                    console.log(oldData);
+                    table.reload('idmytable', {
+                        data: oldData
+                    });
+                    zq_form(newRow, '新增', 500, 500);
+                    break;
+                case 'search':
+                    var name = $('input[name="search"]').val();
+                    table.reload('idmytable', {
+                        url: '/admin/page/wages/findByname',
+                        where: {
+                            name: name,
+                        }, page: {
+                            curr: 1
+                        }, parseData: function (res) { //res 即为原始返回的数据
+                            //重写返回数据格式
+                            var arr = res.data;
+                            var arrayObj = [];
+                            console.log(arr);
+                            for (let i=0,len=arr.length;i<len;i++){
+                                console.log(arr[i]);
+                                let o = {
+                                    wages_id : arr[i].wages_id,
+                                    uid : arr[i].uid,
+                                    unickname : arr[i].user.unickname,
+                                    wages_time : new Date(arr[i].wages_time).Format("yyyy年MM月"),
+                                    basic_wage : arr[i].basic_wage,
+                                    bonus : arr[i].bonus,
+                                    allowance : arr[i].allowance,
+                                    hj : arr[i].basic_wage + arr[i].bonus + arr[i].allowance,
+                                    attendance : arr[i].attendance,
+                                    sj : arr[i].basic_wage + arr[i].bonus + arr[i].allowance - arr[i].attendance,
+                                };
+                                arrayObj.push(o);
+                            }
+                            return {
+                                "code": res.code, //解析接口状态
+                                "msg": res.msg, //解析提示文本
+                                "count": res.count, //解析数据长度
+                                "data": arrayObj //解析数据列表
+                            };
+                        }
+                    });
+                    break;
+            }
+        });
+        //监听工具条
+        table.on('tool(mytable)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            delete data.edits; //删除object多余项
+            if (obj.event === 'detail') {
+                layer.msg('ID：' + data.wages_id + ' 的查看操作');
+            } else if (obj.event === 'del') {
+                layer.confirm('真的删除行么', function (index) {
+                    $.ajax({
+                        url: "/admin/page/wages/Delete",
+                        type: "POST",
+                        dataType: 'json',
+                        data: {wages_id: data.wages_id},
+                        success: function (msg) {
+                            var returnCode = msg.returnCode;
+                            if (returnCode === 200) {
+                                //删除这一行
+                                obj.del();
+                                //关闭弹框
+                                layer.close(index);
+                                layer.msg("删除成功", {icon: 6});
+                            } else {
+                                layer.close(index);
+                                layer.msg("删除失败", {icon: 5});
+                            }
+                        }, error: function (e) {
+                            layer.close(index);
+                            layer.msg("删除失败", {icon: 5});
+                        }
+                    });
+                    return false;
+                });
+            } else if (obj.event === 'edit') {
+                if (obj.event === 'del') {
+                    layer.confirm('真的删除行么', function (index) {
+                        obj.del();
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'edit') {
+                    console.debug(data);
+                    if (data.zt.indexOf("离职")!==-1){
+                        layer.msg("该员工已经离职");
+                        return;
+                    }
+                    zq_form(data, '编辑', 500, 500);
+                    //数据回显
+                    /*$("#zq_form").setForm({id: data.id, name: data.name, telephone: data.telephone, email: data.email,
+                        address: data.address
+                    });*/
+                }
+            }
+        });
+
+
+    });
+
+    var index;//layer.open 打开窗口后的索引，通过layer.close(index)的方法可关闭
+    function zq_form(data, title, w, h) {
+        if (title == null || title === '') {
+            title = false;
+        }
+        if (w == null || w === '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h === '') {
+            h = ($(window).height() - 50);
+        }
+        var layer = layui.layer;
+        index = layer.open({  //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+            type: 1,
+            title: title,
+            area: ['30%', '60%'],//类型：String/Array，默认：'auto'  只有在宽高都定义的时候才不会自适应
+            // area: [w+'px', h +'px'],
+            fix: false, //不固定
+            maxmin: true,//开启最大化最小化按钮
+            shadeClose: true,//点击阴影处可关闭
+            shade: 0.4,//背景灰度
+            content: $('#zq_formpopbox'),
+            success: function (layero, index) {
+                $('#zq_form').setForm(data, layero);
+                form.render('select');
+                layui.laydate.render({
+                    elem: '#time_poped' //layero.find('#time_poped')[0]//指定元素
+                    ,type: 'date'
+                    ,format: 'yyyy-MM-dd'
+                    ,value: data.wages_time
+                    ,trigger: 'click'
+                });
+
+                if (!isNaN(data.wages_id)) {
+                    console.log(true);
+                    $('input[name="wages_id"]').addClass("layui-disabled");
+                    $('input[name="wages_id"]').attr("readonly", "readonly");
+                    //layero.find("input[name='"+data.menu_id+"']").attr("disabled","disabled");
+                    //layero.find("[name='"+data.menu_id+"']").val("3123131")
+                } else {
+                    $('input[name="wages_id"]').removeClass("layui-disabled");
+                    $('input[name="wages_id"]').removeAttr("readonly")
+                }
+            },
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                //var t = $(layero.find("#zq_form"));
+                var data = getOpenFrom(layero, '#zq_form');
+                console.log(data);
+                $.ajax({
+                    url: "/admin/page/wages/update",
+                    type: "POST",
+                    dataType: 'json',
+                    data: data,
+                    success: function (msg) {
+                        var returnCode = msg.returnCode;
+                        if (returnCode === 200) {
+                            layer.close(index);
+                            layer.msg("更新成功", {icon: 6});
+                            window.location.reload();
+                        } else {
+                            layer.close(index);
+                            layer.msg("更新失败", {icon: 5});
+                        }
+                    }
+                });
+            }
+        });
+    }
+</script>
+</body>
+</html>

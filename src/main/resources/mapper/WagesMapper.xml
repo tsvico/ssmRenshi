@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.tsvico.dao.WagesDao">
+    <insert id="updateWage">
+        <!--此处表ID要增加Unique索引 参考语句 ALTER TABLE `TableName` ADD unique(`id`);
+            存在则更新,  影响记录条数2
+            不存在则插入,影响记录条数1-->
+        insert INTO wages
+        (wages_id, uid, wages_time, basic_wage,bonus,allowance,attendance)
+        VALUES (#{wages_id},#{uid},#{wages_time},#{basic_wage},#{bonus},#{allowance},#{attendance})
+        ON DUPLICATE KEY
+            UPDATE
+            uid = #{uid},wages_time = #{wages_time},basic_wage = #{basic_wage},bonus = #{bonus},allowance=#{allowance},attendance=#{attendance}
+    </insert>
+
+    <delete id="deleteWageById">
+        DELETE FROM `wages` WHERE (`wages_id`='${wages_id}')
+    </delete>
+    <select id="getAllWages" resultMap="WagesUserResultMap">
+        <!--根据ID查询Wages并携带user对象实体-->
+        select * from wages w
+        inner join users u on u.uid = w.uid
+    </select>
+    <select id="getWagesById" resultMap="WagesUserResultMap">
+        <!--根据ID查询Wages并携带user对象实体-->
+        select w.*,u.*
+        from wages w
+        inner join users u on u.uid = w.uid
+        where w.uid = #{id}
+    </select>
+
+    <select id="findWageByname" resultMap="WagesUserResultMap">
+        select w.*,u.* from wages w
+        inner join users u on u.uid = w.uid
+        where u.unickname like concat(concat('%',#{name}),'%')
+    </select>
+
+
+    <resultMap id="WagesUserResultMap" type="com.tsvico.pojo.Wages">
+        <id column="wages_id" property="wages_id"/>
+        <id column="uid" property="uid"/>
+        <result column="wages_time" property="wages_time"/>
+        <result column="basic_wage" property="basic_wage"/>
+        <result column="bonus" property="bonus"/>
+        <result column="allowance" property="allowance"/>
+        <result column="attendance" property="attendance"/>
+        <!--关联对象-->
+        <!-- property：名字
+			 javaType：类型
+		 -->
+        <association property="user" javaType="User">
+            <id property="uid" column="uid"/>
+            <result property="uname" column="uname"/>
+            <result property="unickname" column="unickname"/>
+            <result property="status" column="status"/>
+        </association>
+    </resultMap>
+</mapper>

@@ -51,7 +51,7 @@ public interface UserDao {
             "uname=#{uname},upassword=#{upassword},unickname=#{unickname},status=#{status},uage=#{uage},avater=#{avater},email=#{email},dept_id=#{depart.dept_id},position_id=#{position.position_id},role_id=#{role_id}")
     Integer insertUser(User user);
 
-    @Select("select * from users where role_id > #{role_id} and status = 1")
+    @Select("select * from users where role_id >= #{role_id} and status = 1")
     @Results({
             @Result(id=true,column="uid",property="uid"), //列和属性相同可以省略???
             @Result(column="uname",property="uname"),
@@ -76,7 +76,7 @@ public interface UserDao {
     /**
      * 离职员工
      */
-    @Select("select * from users where role_id > #{role_id} and status = 0")
+    @Select("select * from users where role_id >= #{role_id} and status = 0")
     @Results({
             @Result(id=true,column="uid",property="uid"), //列和属性相同可以省略???
             @Result(column="uname",property="uname"),
