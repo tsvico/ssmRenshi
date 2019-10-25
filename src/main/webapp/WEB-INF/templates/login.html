@@ -60,6 +60,10 @@
 </form>
 
 <script>
+    if(self.frameElement && self.frameElement.tagName === "IFRAME"){
+        //登录失效时自动打开到顶级页面
+        window.top.location.replace(self.location); //打开自己网站的页面
+    }
     layui.use(['form'], function () {
         var form = layui.form;
         var remember;

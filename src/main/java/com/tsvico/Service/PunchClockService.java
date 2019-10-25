@@ -1,6 +1,7 @@
 package com.tsvico.Service;
 
 import com.tsvico.pojo.PunchClock;
+import com.tsvico.pojo.PunchClockBb;
 
 import java.util.List;
 
@@ -17,4 +18,5 @@ public interface PunchClockService {
     PunchClock if_punchin(PunchClock punchClock);
     PunchClock if_punchout(PunchClock punchClock);
     List<PunchClock> findPunchClockAll(int offsetLeft,int offsetright);
+    List<PunchClockBb> findPunchClockAll();
 }

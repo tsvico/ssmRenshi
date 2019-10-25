@@ -1,8 +1,8 @@
 package com.tsvico.Contoller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.tsvico.Service.UserService;
 import com.tsvico.Service.WagesService;
-import com.tsvico.dao.UserDao;
 import com.tsvico.pojo.User;
 import com.tsvico.pojo.Wages;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class WagesController {
     private WagesService wagesService;
 
     @Autowired
-    private UserDao userDao;
+    private UserService userService;
 
     //时间问题
     @InitBinder
@@ -43,9 +43,10 @@ public class WagesController {
         User user = (User) session.getAttribute("user");
         model.addAttribute("wages",wagesService.getAll(user));
         if (user.getRole_id()==1)
-            model.addAttribute("users",userDao.getAllUser(user));
+            model.addAttribute("users",userService.getAll(user));
         else
             model.addAttribute("users",user);
+        System.out.println(user);
         return "admin/page/wages";
     }
 

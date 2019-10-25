@@ -1,5 +1,6 @@
 package com.tsvico.dao;
 
+import com.tsvico.pojo.User;
 import com.tsvico.pojo.Wages;
 import org.apache.ibatis.annotations.Param;
 
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public interface WagesDao {
 
-    List<Wages> getAllWages();
+    List<Wages> getAllWages(User user);
 
     Wages getWagesById(int id);
 

@@ -22,6 +22,8 @@
         <!--根据ID查询Wages并携带user对象实体-->
         select * from wages w
         inner join users u on u.uid = w.uid
+        where
+              u.role_id <![CDATA[ >= ]]> ${role_id}
     </select>
     <select id="getWagesById" resultMap="WagesUserResultMap">
         <!--根据ID查询Wages并携带user对象实体-->

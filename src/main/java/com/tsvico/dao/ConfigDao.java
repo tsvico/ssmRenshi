@@ -1,6 +1,7 @@
 package com.tsvico.dao;
 
 import com.tsvico.pojo.Nav;
+import com.tsvico.pojo.User;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
 import org.springframework.stereotype.Repository;
@@ -20,7 +21,7 @@ public interface ConfigDao {
      *
      * @return
      */
-    @Select("select * from menu where parent_id = 0 and is_show = 1")
+    @Select("select * from menu where parent_id = 0 and is_show = 1 and `role_id` >= #{role_id}")
     @Results({
             @Result(id=true,column="menu_id",property="menu_id"), //列和属性相同可以省略???
             @Result(column="is_show",property="is_show"),
@@ -34,7 +35,7 @@ public interface ConfigDao {
                             fetchType= FetchType.EAGER)
             )
     })
-    List<Nav> getAllNav(); //TODO 要传入user的,根据用户权限等级来返回不同的前端页面
+    List<Nav> getAllNav(User user); //TODO 要传入user的,根据用户权限等级来返回不同的前端页面
 
     @Select("select * from menu where parent_id = #{parent_id} and is_show = 1")
     List<Nav> getChild(int parent_id);

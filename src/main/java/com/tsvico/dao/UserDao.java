@@ -35,7 +35,27 @@ public interface UserDao {
     }) //需要指定类型,如果不指定会丢失两个元素
     User findUserByUid(int id);
 
+    /**
+     * 未进行表关联查询
+     * @param id
+     * @return
+     */
+    @Select("select * from users where uid = #{id}")
+    User findUserByid(int id);
+
     @Select("select * from users where uname=#{username} and upassword=#{password}")
+    @Results({
+            @Result(column="dept_id",property="depart",
+                    one=@One(
+                            select="com.tsvico.dao.DepartDao.selectDeptById",
+                            fetchType= FetchType.EAGER
+                    )),
+            @Result(column="position_id",property="position",
+                    one=@One(
+                            select="com.tsvico.dao.PositionDao.selectPositionByid",
+                            fetchType= FetchType.EAGER
+                    )),
+    })
     User findUser(@Param("username") String username,@Param("password") String password); //@Param指定参数名,防止出错
 
     @Delete("DELETE FROM `users` WHERE (`uid`=#{id})")

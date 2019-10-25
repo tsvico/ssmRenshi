@@ -3,6 +3,7 @@ package com.tsvico.Service.Impl;
 import com.tsvico.Service.PunchClockService;
 import com.tsvico.dao.PunchClockDao;
 import com.tsvico.pojo.PunchClock;
+import com.tsvico.pojo.PunchClockBb;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,11 @@ public class PunchClockServiceImpl implements PunchClockService {
     @Override
     public List<PunchClock> findPunchClockAll(int offsetLeft, int offsetright) {
         return punchClockDao.find_punchout_All(offsetLeft,offsetright);
+    }
+
+    @Override
+    public List<PunchClockBb> findPunchClockAll() {
+        return punchClockDao.findBb();
     }
 
     @Override

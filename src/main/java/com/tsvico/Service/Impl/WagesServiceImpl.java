@@ -7,7 +7,6 @@ import com.tsvico.pojo.Wages;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,13 +23,7 @@ public class WagesServiceImpl implements WagesService {
 
     @Override
     public List<Wages> getAll(User user) {
-        if (user.getRole_id()==1)
-            return wagesDao.getAllWages();
-
-        //管理员才显示全部，普通用户只显示自己
-        List<Wages> wagesList = new ArrayList<>();
-        wagesList.add(wagesDao.getWagesById(user.getUid()));
-        return wagesList;
+        return wagesDao.getAllWages(user);
     }
 
     @Override

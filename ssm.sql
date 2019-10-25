@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80012
 File Encoding         : 65001
 
-Date: 2019-10-22 16:38:16
+Date: 2019-10-25 13:50:12
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -58,15 +58,15 @@ CREATE TABLE `menu` (
 -- ----------------------------
 -- Records of menu
 -- ----------------------------
-INSERT INTO `menu` VALUES ('1', '1', null, 'layui-icon-username', '用户管理', '#', '0', null);
-INSERT INTO `menu` VALUES ('2', '1', null, 'layui-icon-log', '考勤管理', '#', '0', null);
-INSERT INTO `menu` VALUES ('3', '1', null, 'layui-icon-radio', '部门管理', 'admin/page/depart', '1', null);
-INSERT INTO `menu` VALUES ('4', '1', null, 'layui-icon-radio', '职位管理', 'admin/page/position', '1', null);
-INSERT INTO `menu` VALUES ('5', '1', null, 'layui-icon-radio', '用户管理', 'admin/page/user', '1', null);
-INSERT INTO `menu` VALUES ('7', '1', null, 'layui-icon-radio', '考勤管理', 'admin/page/punchClock', '2', '0');
-INSERT INTO `menu` VALUES ('9', '1', null, 'layui-icon-radio', '考勤月报表', 'admin/page/dads', '2', null);
-INSERT INTO `menu` VALUES ('10', '1', null, 'layui-icon-chart-screen', '薪资管理', '#', '0', '0');
-INSERT INTO `menu` VALUES ('11', '1', null, 'layui-icon-radio', '离职用户', '/admin/page/leaveUser', '1', '0');
+INSERT INTO `menu` VALUES ('1', '1', null, 'layui-icon-username', '用户管理', '#', '0', '2');
+INSERT INTO `menu` VALUES ('2', '1', null, 'layui-icon-log', '考勤管理', '#', '0', '8');
+INSERT INTO `menu` VALUES ('3', '1', null, 'layui-icon-radio', '部门管理', 'admin/page/depart', '1', '2');
+INSERT INTO `menu` VALUES ('4', '1', null, 'layui-icon-radio', '职位管理', 'admin/page/position', '1', '2');
+INSERT INTO `menu` VALUES ('5', '1', null, 'layui-icon-radio', '用户管理', 'admin/page/user', '1', '2');
+INSERT INTO `menu` VALUES ('7', '1', null, 'layui-icon-radio', '员工考勤管理', 'admin/page/punchClock', '2', '2');
+INSERT INTO `menu` VALUES ('9', '1', null, 'layui-icon-radio', '考勤月报表', 'admin/page/attendReport', '2', '8');
+INSERT INTO `menu` VALUES ('10', '1', null, 'layui-icon-chart-screen', '薪资管理', '/admin/page/wages', '0', '8');
+INSERT INTO `menu` VALUES ('11', '1', null, 'layui-icon-radio', '离职用户', '/admin/page/leaveUser', '1', '2');
 
 -- ----------------------------
 -- Table structure for position
@@ -79,7 +79,7 @@ CREATE TABLE `position` (
   `describtion` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT '描述',
   PRIMARY KEY (`position_id`),
   UNIQUE KEY `position_id` (`position_id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of position
@@ -116,20 +116,23 @@ DROP TABLE IF EXISTS `punchclock`;
 CREATE TABLE `punchclock` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `uid` int(11) DEFAULT NULL COMMENT '用户ID',
-  `punch_inTime` datetime DEFAULT NULL COMMENT '打卡时间',
-  `punch_outTime` datetime DEFAULT NULL COMMENT '签退时间',
-  `attendanceTime` datetime DEFAULT NULL COMMENT '考勤时间',
+  `attendanceTime` date DEFAULT NULL COMMENT '考勤时间',
   `remark` varchar(255) DEFAULT NULL COMMENT '迟到原因备注',
-  `userip` varchar(20) DEFAULT NULL COMMENT 'ip地址',
-  `loginaddress` varchar(255) DEFAULT NULL COMMENT '登录地址',
-  `nickname` varchar(255) DEFAULT NULL COMMENT '用户名',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  `normal_attendance` int(2) DEFAULT '22' COMMENT '正常出勤',
+  `late` int(2) DEFAULT '0' COMMENT '迟到',
+  `zt` int(2) DEFAULT '0' COMMENT '早退',
+  `bj` int(2) DEFAULT '0' COMMENT '病假',
+  `sj` int(2) DEFAULT '0' COMMENT '事假',
+  `kg` int(2) DEFAULT '0' COMMENT '旷工',
+  PRIMARY KEY (`id`),
+  KEY `uid1` (`uid`),
+  CONSTRAINT `uid1` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of punchclock
 -- ----------------------------
-INSERT INTO `punchclock` VALUES ('1', '1', '2019-10-08 00:00:00', '2019-10-17 00:00:00', '2019-10-17 00:00:00', null, '127.0.0.1', '127.0.0.1', '小张');
+INSERT INTO `punchclock` VALUES ('1', '10002', '2019-10-15', '1', '22', '1', '2', '3', '4', '5');
 
 -- ----------------------------
 -- Table structure for role
@@ -149,6 +152,7 @@ INSERT INTO `role` VALUES ('1', '超级管理员', null);
 INSERT INTO `role` VALUES ('2', 'CEO', null);
 INSERT INTO `role` VALUES ('3', '总经理', null);
 INSERT INTO `role` VALUES ('4', '部门经理', null);
+INSERT INTO `role` VALUES ('5', '普通员工', null);
 
 -- ----------------------------
 -- Table structure for users
@@ -173,15 +177,41 @@ CREATE TABLE `users` (
   KEY `FFFFposition_id` (`position_id`) USING BTREE,
   KEY `FFFFrole` (`role_id`),
   KEY `FFFFdept_id` (`dept_id`),
+  KEY `unickname` (`unickname`),
   CONSTRAINT `FFFFdept_id` FOREIGN KEY (`dept_id`) REFERENCES `department` (`dept_id`),
   CONSTRAINT `FFFFposition_id` FOREIGN KEY (`position_id`) REFERENCES `position` (`position_id`),
   CONSTRAINT `FFFFrole` FOREIGN KEY (`role_id`) REFERENCES `role` (`role_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=10005 DEFAULT CHARSET=utf8;
 
 -- ----------------------------
 -- Records of users
 -- ----------------------------
-INSERT INTO `users` VALUES ('1', 'admin', '3c2cad99c8ac041e41d55da41942fddf', '管理员-大牛', '10086', '20', 'https://api.adorable.io/avatars/100/admin', '2019-10-01', 'tsxygwj@163.com', '1', '1', '1', '1');
-INSERT INTO `users` VALUES ('2', 'zhang', '3c2cad99c8ac041e41d55da41942fddf', '张三', '1234565', '44', 'https://api.adorable.io/avatars/100/zhang', '2019-10-08', 'www@163.com', '1', '2', '4', '4');
-INSERT INTO `users` VALUES ('3', 'wang', '3c2cad99c8ac041e41d55da41942fddf', null, null, '19', 'https://api.adorable.io/avatars/100/aac', null, 'tsxygwj@qqqq.com', '0', '5', '23', '1');
-INSERT INTO `users` VALUES ('4', 'dali', '3c2cad99c8ac041e41d55da41942fddf', null, null, '44', 'https://api.adorable.io/avatars/100/dali', null, 'wq@qq.com', '1', '5', '7', '4');
+INSERT INTO `users` VALUES ('10001', 'admin', '3c2cad99c8ac041e41d55da41942fddf', '管理', '10086', '20', 'https://api.adorable.io/avatars/100/admin', '2019-10-01', 'tsxygwj@163.com', '1', '1', '1', '1');
+INSERT INTO `users` VALUES ('10002', 'zhang', '3c2cad99c8ac041e41d55da41942fddf', '张三', '1234565', '44', 'https://api.adorable.io/avatars/100/zhang', '2019-10-08', 'www@163.com', '1', '2', '4', '4');
+INSERT INTO `users` VALUES ('10003', 'wang', '3c2cad99c8ac041e41d55da41942fddf', '大花', '1234', '19', 'https://api.adorable.io/avatars/100/aac', '2019-10-23', 'tsxygwj@qqqq.com', '0', '5', '23', '5');
+INSERT INTO `users` VALUES ('10004', 'dali', '3c2cad99c8ac041e41d55da41942fddf', '小丁', '3123', '44', 'https://api.adorable.io/avatars/100/dali', '2019-10-04', 'wq@qq.com', '1', '5', '7', '4');
+
+-- ----------------------------
+-- Table structure for wages
+-- ----------------------------
+DROP TABLE IF EXISTS `wages`;
+CREATE TABLE `wages` (
+  `wages_id` int(10) NOT NULL,
+  `uid` int(10) NOT NULL,
+  `wages_time` date DEFAULT NULL COMMENT '工资年月',
+  `basic_wage` float DEFAULT NULL COMMENT '基本工资',
+  `bonus` float DEFAULT NULL COMMENT '奖金',
+  `allowance` float DEFAULT NULL COMMENT '津贴',
+  `attendance` float DEFAULT NULL COMMENT '考勤薪资',
+  PRIMARY KEY (`wages_id`),
+  UNIQUE KEY `id` (`wages_id`) USING BTREE,
+  KEY `uid` (`uid`),
+  CONSTRAINT `uid` FOREIGN KEY (`uid`) REFERENCES `users` (`uid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- ----------------------------
+-- Records of wages
+-- ----------------------------
+INSERT INTO `wages` VALUES ('1', '10002', '2019-10-09', '1000', '100', '15', '30');
+INSERT INTO `wages` VALUES ('2', '10003', '2019-10-09', '1000', '100', '22', '10');
+INSERT INTO `wages` VALUES ('3', '10004', '2013-03-24', '1000', '100', '15', '0');

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="cn" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="admin/_fragments::head">
+</head>
+<body>
+<style type="text/css">
+    .layui-table-cell {
+        height: auto;
+        padding: unset;
+        text-align: center;
+    }
+</style>
+<div class="layui-main">
+    <br>
+    <div style="float:left;">制表部门：人事管理部</div>
+    <div style="float:right;" th:text="${'制表日期：'+#dates.format(new java.util.Date().getTime(), 'yyyy年MM月')}">制表日期</div>
+    <br>
+    <!--列合并 https://yelog.org/layui-table-merge/  -->
+    <table lay-even class="layui-table layui-hide" lay-filter="mytable" lay-data="{id: 'idmytable'}">
+        <thead>
+        <tr>
+            <th lay-data="{field:'id',width:45}">序号</th>
+            <th lay-data="{field:'nickname',width:75}">部门</th>
+            <th lay-data="{field:'attendanceTime',width:75}">姓名</th>
+            <th lay-data="{field:'userip',width:78}" >应出勤&lt;br&gt;(天)</th>
+            <th lay-data="{field:'remark',width:78}" >出勤(天)</th>
+            <th lay-data="{field:'center1',width:78}">病假(天)</th>
+            <th lay-data="{field:'center2',width:78}" >事假(天)</th>
+            <th lay-data="{field:'center3',width:78}" >迟到(天)</th>
+            <th lay-data="{field:'center4',width:78}">早退(天)</th>
+            <th lay-data="{field:'center5',width:78}" >忘打卡次数</th>
+            <th lay-data="{field:'remark6', width:78}">缺勤(天)</th>
+            <th lay-data="{field:'remark7', width:78}">旷工(天)</th>
+            <th lay-data="{field:'remark8', width:105}">备注</th>
+        </tr>
+        </thead>
+        <!--/*@thymesVar id="punchclock" type="com.tsvico.pojo.PunchClockBb"*/-->
+        <tbody th:each="punchclock : ${punchClocks}">
+        <tr>
+            <td th:text="${punchclock.id}"></td>
+            <td th:text="${punchclock.deparment}"></td>
+            <td th:text="${punchclock.unickname}"></td>
+            <td th:text="${22}"></td>
+            <td th:text="${punchclock.normal_attendance}"></td>
+            <td th:text="${punchclock.bj}">病假</td>
+            <td th:text="${punchclock.sj}">事假</td>
+            <td th:text="${punchclock.late}">迟到</td>
+            <td th:text="${punchclock.zt}">早退</td>
+            <td th:text="0">忘记打卡</td>
+            <td th:text="22-${punchclock.normal_attendance}">缺勤</td>
+            <td th:text="${punchclock.kg}">旷工</td>
+        </tr>
+        </tbody>
+    </table>
+    <script type="text/html" id="toolbarDemo">
+        <div>
+            <div class="layui-input-inline">
+                <input class="layui-input" placeholder="开始日" id="start">
+            </div>
+            <div class="layui-input-inline">
+                <input class="layui-input" placeholder="截止日" id="end">
+            </div>
+        </div>
+    </script>
+</div>
+
+<div th:replace="admin/_fragments::script"></div>
+<script src="/js/common.js"></script>
+<script>
+    var root = "/admin/page/punchClock/";
+    layui.use(['table','laydate'], function () {
+        var table = layui.table
+            ,laydate = layui.laydate;
+
+        var nowTime = new Date().valueOf();
+        //转换静态表格
+        var tabIns = table.init('mytable', {
+            limit: 10 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
+            , page: true
+            , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
+            , id: 'tableId'
+            ,done: function (res, curr, count) {
+                $('tr').css({'background-color': 'rgba(255,255,255,0)', 'color': '#000000'});
+            }
+            //支持所有基础参数
+        });
+
+        //日期
+        var start = laydate.render({ //开始
+            elem: '#start',
+            max:nowTime.month-1,
+            done:function(value,date){
+
+            }
+        });
+        var end = laydate.render({ //结束
+            elem: '#end',
+            max : nowTime,
+            value: new Date(),
+            done:function(value,date){
+                if($.trim(value) === ''){
+                    var curDate = new Date();
+                    date = {'date': curDate.getDate(), 'month': curDate.getMonth()+1, 'year': curDate.getFullYear()};
+                }
+                console.log(start.config.dateTime);
+                start.config.max = date;
+                start.config.max.month = date.month -1;
+            }
+        });
+
+        //头工具栏事件
+        table.on('toolbar(mytable)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'addNewDate':
+                    //打卡
+                    layer.open({
+                        title: '打卡',
+                        area: ['650px', '350px'],
+                        type: 1,
+                        content: $('#daka'),//跳转controller
+                        cancel: function () {
+                        },
+                        success: function (layero,index) {
+                            //获取打卡时间
+                            $.ajax({
+                                url: root+'in_time',
+                                type: 'POST',
+                                dataType: 'json',
+                                data: {
+                                },
+                                success: function (in_time) {
+                                    out_time();
+                                    if (in_time.code===200){
+                                        document.getElementById('in_text').value = in_time.data;
+                                    }
+                                },
+                                error: function (XMLHttpRequest) {
+                                    console.log('XMLHttpRequest:');
+                                    console.log(XMLHttpRequest);
+                                    alert('网络异常！尝试刷新网页解决问题');
+                                }
+                            });
+                            function out_time(){
+                                $.ajax({
+                                    url: root+'out_time',
+                                    type: 'POST',
+                                    dataType: 'json',
+                                    data: {
+                                    },
+                                    success: function (out_time) {
+                                        if (out_time.code===200){
+                                            document.getElementById('out_text').value = out_time.data;
+                                        }
+                                    },
+                                    error: function (XMLHttpRequest) {
+                                        console.log('XMLHttpRequest:');
+                                        console.log(XMLHttpRequest);
+                                        alert('网络异常！尝试刷新网页解决问题');
+                                    }
+                                })
+                            }
+                            $(function(){
+                                //获取城市ajax
+                                $.ajax({
+                                    url: 'http://api.map.baidu.com/location/ip?ak=ia6HfFL660Bvh43exmH9LrI6',
+                                    type: 'POST',
+                                    dataType: 'jsonp',
+                                    success:function(data) {
+                                        $('#city').html(JSON.stringify(data.content.address_detail.province + "," + data.content.address_detail.city))
+                                    }
+                                });
+                            })
+
+                        }
+                    });
+                    break;
+            }
+        });
+        //监听工具条
+        table.on('tool(mytable)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            delete data.edits; //删除object多余项
+            if (obj.event === 'edit') {
+                if (obj.event === 'del') {
+                    layer.confirm('真的删除行么', function (index) {
+                        obj.del();
+                        layer.close(index);
+                    });
+                } else if (obj.event === 'edit') {
+                    console.debug(data);
+                }
+            }
+        });
+
+
+    });
+
+    $('#in_btn').on('click',function () {
+        var loginaddress = $("#city").text();
+        $.ajax({
+            url: root+'punch_in',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                loginaddress: loginaddress,
+            },
+            success: function (res) {
+                var result = res.intdata;
+                //1:打卡成功，2：打卡失败（超过9点20，打卡状态为迟到），3：打卡失败（超过9点20后任不打卡，超过10点为缺席）
+                if (result >= 1) {
+                    layer.msg("打卡成功!");
+                } else if (result === -2) {
+                    layer.confirm("打卡成功，您已迟到，请填写迟到原因!",{
+                        btn:['确定','取消']
+                    },function (){
+                        layer.open({
+                            title: '迟到原因说明',
+                            area: ['650px', '250px'],
+                            type: 1,
+                            content: $('#chidao'),
+                            cancel: function () {
+                            }
+                        });
+                    },function () {
+                    })
+                } else if (result == -3) {
+                    layer.msg("打卡失败，当前状态为缺勤!");
+                }else if(result == -4){
+                    layer.msg("您已打卡，请勿重复打卡!");
+                }
+            },
+            error: function (XMLHttpRequest) {
+                console.log('XMLHttpRequest:');
+                console.log(XMLHttpRequest);
+                alert('网络异常！尝试刷新网页解决问题');
+            }
+        })
+    });
+    $('#out_btn').on('click',function () {
+        $.ajax({
+            url: root+'punch_out',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+            },
+            success: function (res) {
+                var result = res.intdata;
+                if (result >= 1) {
+                    layer.msg("签退成功!");
+                    out_time();
+                } else if (result == -2) {
+                    layer.msg("早退提示：当前未到签退时间!");
+                }else if(result == -3){
+                    layer.msg("您已签退，请勿重复签退!");
+                }
+            },
+            error: function (XMLHttpRequest) {
+                console.log('XMLHttpRequest:');
+                console.log(XMLHttpRequest);
+                alert('网络异常！尝试刷新网页解决问题');
+            }
+        })
+    });
+
+    //迟到
+    $('#latego').on('click',function () {
+        var remark = document.getElementById('lateresult').value;
+        $.ajax({
+            url: root+'late',
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                remark: remark,
+            },
+            success: function (res) {
+                var result = res.intdata;
+                if (result > 0) {
+                    layer.confirm("迟到原因填写成功!",{
+                        btn:['确定']
+                    },function (){
+                        window.parent.location.reload();
+                    })
+
+                }
+            },
+            error: function (XMLHttpRequest) {
+                console.log('XMLHttpRequest:');
+                console.log(XMLHttpRequest);
+                alert('网络异常！尝试刷新网页解决问题');
+            }
+        })
+    })
+
+
+</script>
+</body>
+</html>

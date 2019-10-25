@@ -1,26 +1,16 @@
 package com.tsvico.Contoller;
 
-import com.alibaba.fastjson.JSONObject;
 import com.tsvico.Service.PunchClockService;
-import com.tsvico.pojo.PunchClock;
+import com.tsvico.Service.UserService;
 import com.tsvico.pojo.User;
-import com.tsvico.util.JsonBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author tsvico
@@ -29,11 +19,14 @@ import java.util.List;
  * 功能
  */
 @Controller
-@RequestMapping(value = "admin/page/punchClock")
+@RequestMapping(value = "admin/page")
 public class PunchClockController {
 
     @Autowired
     private PunchClockService punchClockService;
+
+    @Autowired
+    private UserService userService;
 
     @Value("${punch_in_f}")
     public String punch_in_f; //获取上班时间
@@ -43,14 +36,19 @@ public class PunchClockController {
     public String punch_out; //获取下班时间
 
 
-    @RequestMapping()
-    public String punchClock(Model model) {
-        List<PunchClock> p = punchClockService.findPunchClockAll(0,20);
-        System.out.println(p.size());
-        model.addAttribute("punchClocks",p);
+    @RequestMapping("/punchClock")
+    public String punchClock(Model model, HttpSession session) {
+        model.addAttribute("punchClocks",punchClockService.findPunchClockAll(0,20));
+        User user = (User) session.getAttribute("user");
+        if (user.getRole_id()==1)
+            model.addAttribute("users",userService.getAll(user));
+        else
+            model.addAttribute("users",user);
+
         return "admin/page/punchClock";
     }
 
+    /*
     @RequestMapping(value = "lateinfo",produces = "application/json;charset=UTF-8")
     public ModelAndView lateinfo(HttpServletRequest request,
                                  HttpServletResponse response) {
@@ -59,7 +57,7 @@ public class PunchClockController {
     }
 
     //获取打卡时间
-    @RequestMapping(value = "in_time",produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/punchClock/in_time",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String in_time(HttpSession session) throws Exception {
         JsonBean in_time = new JsonBean();
@@ -84,7 +82,7 @@ public class PunchClockController {
         return JSONObject.toJSONString(in_time);
     }
     //获取签退时间
-    @RequestMapping(value = "out_time",produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/punchClock/out_time",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String out_time(HttpSession session) throws Exception {
         JsonBean out_time = new JsonBean();
@@ -107,7 +105,7 @@ public class PunchClockController {
     }
 
     //上班打卡
-    @RequestMapping(value = "punch_in",produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/punchClock/punch_in",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String punch_in(String loginaddress, HttpServletRequest request,HttpSession session) throws Exception {
         JsonBean resultTotal = new JsonBean();
@@ -164,7 +162,7 @@ public class PunchClockController {
     }
 
     //迟到说明情况
-    @RequestMapping(value = "late",produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/punchClock/late",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String late(String remark,HttpSession session) throws Exception {
         //获取当前操作的用户
@@ -182,7 +180,7 @@ public class PunchClockController {
     }
 
     //下班签退
-    @RequestMapping(value = "punch_out",produces = "application/json;charset=UTF-8")
+    @RequestMapping(value = "/punchClock/punch_out",produces = "application/json;charset=UTF-8")
     @ResponseBody
     public String Punch_out(HttpServletRequest request,HttpSession session) throws Exception {
         //获取当前操作的用户
@@ -209,5 +207,11 @@ public class PunchClockController {
             resultTotal.setIntdata(-3);
         }
         return JSONObject.toJSONString(resultTotal);
+    }
+    */
+    @GetMapping("/attendReport")
+    public String attendReport(Model model){
+        model.addAttribute("punchClocks",punchClockService.findPunchClockAll());
+        return "admin/page/AttendanceReport";
     }
 }

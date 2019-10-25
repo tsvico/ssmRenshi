@@ -3,28 +3,63 @@
 <head th:replace="admin/_fragments::head">
 </head>
 <body>
+<style type="text/css">
+    .layui-table-cell {
+        height: auto;
+        padding: unset;
+        text-align: center;
+    }
+</style>
 <div class="layui-main">
     <table lay-even class="layui-table layui-hide" lay-filter="mytable" lay-data="{id: 'idmytable'}">
         <thead>
         <tr>
-            <th lay-data="{field:'id', width:50}">ID</th>
-            <th lay-data="{field:'nickname', width:120}">用户名</th>
-            <th lay-data="{field:'attendanceTime', width:140,sort: true}">时间</th>
-            <th lay-data="{field:'userip', width:140}">IP</th>
-            <th lay-data="{field:'remark', width:140}">备注</th>
-            <th lay-data="{field:'describtion', width:140}">状态</th>
-            <th th:if="${session.user.role_id==1}" lay-data="{field:'edits',minWidth: 280,toolbar: '#barDemo'}">操作</th>
+            <th lay-data="{field:'id',width:20}" rowspan="2">序&lt;br&gt;号</th>
+            <th lay-data="{field:'uid',width:55}" rowspan="2">员工&lt;br&gt;编号</th>
+            <th lay-data="{field:'nickname',width:55}" rowspan="2">姓&lt;br&gt;名</th>
+            <th lay-data="{field:'attendanceTime',width:75}" rowspan="2">考勤月份</th>
+            <th lay-data="{field:'normal_attendance',width:75}" rowspan="2">正常出勤</th>
+            <th lay-data="{align:'center',width:125}" colspan="2">迟到次数&lt;br&gt;(20.0元/次)</th>
+            <th lay-data="{align:'center',width:125}" colspan="2">早退次数&lt;br&gt;(20.0元/次)</th>
+            <th lay-data="{align:'center',width:125}" colspan="2">病假天数&lt;br&gt;(100.0元/天)</th>
+            <th lay-data="{align:'center',width:125}" colspan="2">事假天数&lt;br&gt;(200.0元/天)</th>
+            <th lay-data="{align:'center',width:125}" colspan="2">旷工天数&lt;br&gt;(300.0元/天)</th>
+            <th lay-data="{field:'remark', width:75}" rowspan="2">合计扣除</th>
+            <th th:if="${session.user.role_id==1}" lay-data="{field:'edits',width:140,toolbar: '#barDemo'}" rowspan="2">操作</th>
+        </tr>
+        <tr>
+            <th lay-data="{field:'late',width:62}">迟到次数</th>
+            <th lay-data="{field:'latemoney',width:62}">扣除</th>
+            <th lay-data="{field:'zt',width:62}">早退次数</th>
+            <th lay-data="{field:'ztmoney',width:62}">扣除</th>
+            <th lay-data="{field:'bj',width:62}">病假天数</th>
+            <th lay-data="{field:'bjmoney',width:62}">扣除</th>
+            <th lay-data="{field:'sj',width:62}">事假天数</th>
+            <th lay-data="{field:'sjmoney',width:62}">扣除</th>
+            <th lay-data="{field:'kg',width:62}">旷工天数</th>
+            <th lay-data="{field:'kgmoney',width:62}">扣除</th>
         </tr>
         </thead>
         <!--/*@thymesVar id="punchclock" type="com.tsvico.pojo.PunchClock"*/-->
         <tbody th:each="punchclock : ${punchClocks}">
         <tr>
             <td th:text="${punchclock.id}"></td>
-            <td th:text="${punchclock.nickname}"></td>
-            <td th:text="${#dates.format(punchclock.attendanceTime,'yyyy-MM-dd HH:mm:ss')}"></td>
-            <td th:text="${punchclock.userip}"></td>
-            <td th:text="${punchclock.remark}"></td>
-            <td th:text="${punchclock.punch_inTime}"></td>
+            <td th:text="${punchclock.user.uid}"></td>
+            <td th:text="${punchclock.user.unickname}"></td>
+            <td th:text="${#dates.format(punchclock.attendanceTime,'yyyy年MM月')}"></td>
+            <td th:text="${punchclock.normal_attendance}"></td>
+            <td th:text="${punchclock.zt*20.0+punchclock.bj*100.0+punchclock.sj*200.0+punchclock.kg*300.0}">合计</td>
+            <td></td>
+            <td th:text="${punchclock.late}">迟到</td>
+            <td th:text="${punchclock.late*20.0}"></td>
+            <td th:text="${punchclock.zt}">早退</td>
+            <td th:text="${punchclock.zt*20.0}"></td>
+            <td th:text="${punchclock.bj}">病假</td>
+            <td th:text="${punchclock.bj*100.0}"></td>
+            <td th:text="${punchclock.sj}">事假</td>
+            <td th:text="${punchclock.sj*200.0}"></td>
+            <td th:text="${punchclock.kg}">旷工</td>
+            <td th:text="${punchclock.kg*300.0}"></td>
             <td th:if="${session.user.role_id==1}"></td>
         </tr>
         </tbody>
@@ -32,7 +67,7 @@
     <script type="text/html" id="toolbarDemo">
         <div class="layui-btn-container">
             <button type="button" class="layui-btn layui-btn-sm" lay-event="addNewDate">
-                <i class="layui-icon">&#xe63c;</i> 打卡
+                <i class="layui-icon">&#xe63c;</i> 添加
             </button>
         </div>
     </script>
@@ -42,62 +77,85 @@
         </a>&nbsp;&nbsp;
     </script>
 </div>
-<!--打卡-->
-<div class="layui-row" id="daka" style="display:none;position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;">
-    <div class="layui-form-item">
-        <div>
-            <form class="layui-form">
-                <div align="center">
-                    当前位置：<p id="city"></p>
-                </div><br>
-                <div class="layui-form-item" }>
-                    <label class="layui-form-label">打卡时间:</label>
-                    <div class="layui-input-block" style="width: 250px">
-                        <input type="text" id="in_text" name='' required  value=""
-                               autocomplete="off" class="layui-input" readonly>
-                    </div>
-                    <div class="layui-form-item" style="margin-top: 0.4em;">
-                        <div class="layui-input-block" style="width: 400px">
-                            <button class="layui-btn layui-btn-normal" type="button" id="in_btn">打卡</button>
-                        </div>
-                    </div>
-                </div>
-                <br>
-                <div class="layui-form-item" }>
-                    <label class="layui-form-label">签退时间:</label>
-                    <div class="layui-input-block" style="width: 250px">
-                        <input type="text" id="out_text" name='' required value=""
-                               autocomplete="off" class="layui-input" readonly>
-                    </div>
-                    <div class="layui-form-item" style="margin-top: 0.4em;">
-                        <div class="layui-input-block" style="width: 400px">
-                            <button class="layui-btn layui-btn-normal" type="button" id="out_btn">签退</button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-<!--迟到-->
-<div id="chidao" class="layui-form-item" style="display:none;position: absolute;
-    top: 0; left: 0; bottom: 0; right: 0;">
-    <div class="layui-input-block">
-        <form class="layui-form">
-            <div class="layui-form-item" }>
-                <br><br><br>
-                <label class="layui-form-label">迟到原因:</label>
-                <div class="layui-input-block" style="width: 250px">
-                    <input type="textbox" id="lateresult" name='' required
-                           autocomplete="off" class="layui-input" >
-                </div><br>
-                <div class="layui-form-item">
-                    <div class="layui-input-block" style="width: 400px">
-                        <button class="layui-btn" type="button" id="latego">确定</button>
+
+<div class="layui-row" id="zq_formpopbox" style="display:none;position: absolute;
+    top: 0; left: 0; bottom: 0; right: 0;" `>
+    <div class="layui-col-md11">
+        <form id="zq_form" class="layui-form" action="" style="margin-top: 20px;align:center;">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">员工名称</label>
+                    <div class="layui-input-inline">
+                        <select name="uid" lay-verify="required">
+                            <!--/*@thymesVar id="users" type="com.tsvico.pojo.User"*/-->
+                            <option th:each="user:${users}" th:value="${user.uid}" th:text="${user.unickname}"></option>
+                        </select>
                     </div>
                 </div>
             </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">考勤年月</label>
+                <div class="layui-input-inline">
+                    <input type="text" id="time_poped" name="attendanceTime" required lay-verify="required" placeholder="工资年月" autocomplete="off"
+                           class="layui-input">
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">正常出勤</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="normal_attendance" placeholder="正常出勤"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">迟到次数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="late" placeholder="迟到次数"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">早退次数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="zt" placeholder="早退次数"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">病假天数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="bj" placeholder="病假天数"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">事假天数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="sj" placeholder="事假天数"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">旷工天数</label>
+                    <div class="layui-input-inline">
+                        <input type="number" required lay-verify="required" name="kg" placeholder="旷工天数"
+                               class="layui-input">
+                    </div>
+                </div>
+            </div>
+
         </form>
     </div>
 </div>
@@ -106,15 +164,19 @@
 <script src="/js/common.js"></script>
 <script>
     var root = "/admin/page/punchClock/";
+    var form;
     layui.use(['table','laydate'], function () {
         var table = layui.table;
-
+        form = layui.form;
         //转换静态表格
         var tabIns = table.init('mytable', {
             limit: 10 //注意：请务必确保 limit 参数（默认：10）是与你服务端限定的数据条数一致
             , page: true
             , toolbar: '#toolbarDemo' //开启头部工具栏，并为其绑定左侧模板
             , id: 'tableId'
+            , done: function (res, curr, count) {
+                $('tr').css({'background-color': 'rgba(29,255,90,0)', 'color': '#242632'});
+            }
             //支持所有基础参数
         });
 
@@ -125,66 +187,17 @@
             switch (obj.event) {
                 case 'addNewDate':
                     //打卡
-                    layer.open({
-                        title: '打卡',
-                        area: ['650px', '350px'],
-                        type: 1,
-                        content: $('#daka'),//跳转controller
-                        cancel: function () {
-                        },
-                        success: function (layero,index) {
-                            //获取打卡时间
-                            $.ajax({
-                                url: root+'in_time',
-                                type: 'POST',
-                                dataType: 'json',
-                                data: {
-                                },
-                                success: function (in_time) {
-                                    out_time();
-                                    if (in_time.code===200){
-                                        document.getElementById('in_text').value = in_time.data;
-                                    }
-                                },
-                                error: function (XMLHttpRequest) {
-                                    console.log('XMLHttpRequest:');
-                                    console.log(XMLHttpRequest);
-                                    alert('网络异常！尝试刷新网页解决问题');
-                                }
-                            });
-                            function out_time(){
-                                $.ajax({
-                                    url: root+'out_time',
-                                    type: 'POST',
-                                    dataType: 'json',
-                                    data: {
-                                    },
-                                    success: function (out_time) {
-                                        if (out_time.code===200){
-                                            document.getElementById('out_text').value = out_time.data;
-                                        }
-                                    },
-                                    error: function (XMLHttpRequest) {
-                                        console.log('XMLHttpRequest:');
-                                        console.log(XMLHttpRequest);
-                                        alert('网络异常！尝试刷新网页解决问题');
-                                    }
-                                })
-                            }
-                            $(function(){
-                                //获取城市ajax
-                                $.ajax({
-                                    url: 'http://api.map.baidu.com/location/ip?ak=ia6HfFL660Bvh43exmH9LrI6',
-                                    type: 'POST',
-                                    dataType: 'jsonp',
-                                    success:function(data) {
-                                        $('#city').html(JSON.stringify(data.content.address_detail.province + "," + data.content.address_detail.city))
-                                    }
-                                });
-                            })
-
-                        }
+                    layer.msg("添加");
+                    //添加行
+                    var oldData = table.cache['idmytable'];
+                    var lastId = oldData[oldData.length - 1].id;
+                    var newRow = {id: parseInt(lastId) + 1, uid: 1, attendanceTime: 2019-10-15, normal_attendance: '22'};
+                    oldData.push(newRow);
+                    console.log(oldData);
+                    table.reload('idmytable', {
+                        data: oldData
                     });
+                    zq_form(newRow, '新增', 500, 500);
                     break;
             }
         });
@@ -208,103 +221,65 @@
 
     });
 
-    $('#in_btn').on('click',function () {
-        var loginaddress = $("#city").text();
-        $.ajax({
-            url: root+'punch_in',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                loginaddress: loginaddress,
+    var index;//layer.open 打开窗口后的索引，通过layer.close(index)的方法可关闭
+    function zq_form(data, title, w, h) {
+        if (title == null || title === '') {
+            title = false;
+        }
+        if (w == null || w === '') {
+            w = ($(window).width() * 0.9);
+        }
+        if (h == null || h === '') {
+            h = ($(window).height() - 50);
+        }
+        var layer = layui.layer;
+        index = layer.open({  //layer提供了5种层类型。可传入的值有：0（信息框，默认）1（页面层）2（iframe层）3（加载层）4（tips层）
+            type: 1,
+            title: title,
+            area: ['30%', '60%'],//类型：String/Array，默认：'auto'  只有在宽高都定义的时候才不会自适应
+            // area: [w+'px', h +'px'],
+            fix: false, //不固定
+            maxmin: true,//开启最大化最小化按钮
+            shadeClose: true,//点击阴影处可关闭
+            shade: 0.4,//背景灰度
+            content: $('#zq_formpopbox'),
+            success: function (layero, index) {
+                $('#zq_form').setForm(data, layero);
+                form.render('select');
+                layui.laydate.render({
+                    elem: '#time_poped' //layero.find('#time_poped')[0]//指定元素
+                    ,type: 'date'
+                    ,format: 'yyyy-MM-dd'
+                    ,value: new Date()
+                    ,trigger: 'click'
+                });
             },
-            success: function (res) {
-                var result = res.intdata;
-                //1:打卡成功，2：打卡失败（超过9点20，打卡状态为迟到），3：打卡失败（超过9点20后任不打卡，超过10点为缺席）
-                if (result >= 1) {
-                    layer.msg("打卡成功!");
-                } else if (result === -2) {
-                    layer.confirm("打卡成功，您已迟到，请填写迟到原因!",{
-                        btn:['确定','取消']
-                    },function (){
-                        layer.open({
-                            title: '迟到原因说明',
-                            area: ['650px', '250px'],
-                            type: 1,
-                            content: $('#chidao'),
-                            cancel: function () {
-                            }
-                        });
-                    },function () {
-                    })
-                } else if (result == -3) {
-                    layer.msg("打卡失败，当前状态为缺勤!");
-                }else if(result == -4){
-                    layer.msg("您已打卡，请勿重复打卡!");
-                }
-            },
-            error: function (XMLHttpRequest) {
-                console.log('XMLHttpRequest:');
-                console.log(XMLHttpRequest);
-                alert('网络异常！尝试刷新网页解决问题');
+            btnAlign: 'c',
+            btn: ['确定', '取消'],
+            yes: function (index, layero) {
+                //var t = $(layero.find("#zq_form"));
+                var data = getOpenFrom(layero, '#zq_form');
+                console.log(data);
+                $.ajax({
+                    url: root+"/insert",
+                    type: "POST",
+                    dataType: 'json',
+                    data: data,
+                    success: function (msg) {
+                        var returnCode = msg.returnCode;
+                        if (returnCode === 200) {
+                            layer.close(index);
+                            layer.msg("更新成功", {icon: 6});
+                            window.location.reload();
+                        } else {
+                            layer.close(index);
+                            layer.msg("更新失败", {icon: 5});
+                        }
+                    }
+                });
             }
-        })
-    });
-    $('#out_btn').on('click',function () {
-        $.ajax({
-            url: root+'punch_out',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-            },
-            success: function (res) {
-                var result = res.intdata;
-                if (result >= 1) {
-                    layer.msg("签退成功!");
-                    out_time();
-                } else if (result == -2) {
-                    layer.msg("早退提示：当前未到签退时间!");
-                }else if(result == -3){
-                    layer.msg("您已签退，请勿重复签退!");
-                }
-            },
-            error: function (XMLHttpRequest) {
-                console.log('XMLHttpRequest:');
-                console.log(XMLHttpRequest);
-                alert('网络异常！尝试刷新网页解决问题');
-            }
-        })
-    });
-
-    //迟到
-    $('#latego').on('click',function () {
-        var remark = document.getElementById('lateresult').value;
-        $.ajax({
-            url: root+'late',
-            type: 'POST',
-            dataType: 'json',
-            data: {
-                remark: remark,
-            },
-            success: function (res) {
-                var result = res.intdata;
-                if (result > 0) {
-                    layer.confirm("迟到原因填写成功!",{
-                        btn:['确定']
-                    },function (){
-                        window.parent.location.reload();
-                    })
-
-                }
-            },
-            error: function (XMLHttpRequest) {
-                console.log('XMLHttpRequest:');
-                console.log(XMLHttpRequest);
-                alert('网络异常！尝试刷新网页解决问题');
-            }
-        })
-    })
-
-
+        });
+    }
 </script>
 </body>
 </html>

@@ -22,7 +22,7 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Override
     public List<Nav> getMenu(User user) {
-        return configDao.getAllNav();
+        return configDao.getAllNav(user);
     }
 
     @Override

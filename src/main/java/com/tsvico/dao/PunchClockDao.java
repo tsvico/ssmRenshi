@@ -1,10 +1,9 @@
 package com.tsvico.dao;
 
 import com.tsvico.pojo.PunchClock;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import com.tsvico.pojo.PunchClockBb;
+import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.mapping.FetchType;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,6 +16,7 @@ import java.util.List;
  */
 @Repository
 public interface PunchClockDao {
+
     /**
      * //打卡
      * @param punchClock
@@ -72,5 +72,19 @@ public interface PunchClockDao {
      * @return
      */
     @Select("SELECT * FROM `punchclock` ORDER BY id DESC LIMIT #{offsetLeft}, #{offsetright}")
+    @Results({
+            @Result(column="uid",property="user",
+                    one=@One(
+                            select="com.tsvico.dao.UserDao.findUserByid",
+                            fetchType= FetchType.EAGER
+                    ))
+    })
     List<PunchClock> find_punchout_All(@Param("offsetLeft") int offsetLeft,@Param("offsetright") int offsetright);
+
+    /**
+     * 报表查询
+     * @return
+     */
+    @Select("SELECT p.*,u.unickname,d.`name` as deparment FROM `punchclock` p,users u,department d where p.uid=u.uid and u.dept_id=d.dept_id ORDER BY u.dept_id DESC ")
+    List<PunchClockBb> findBb();
 }

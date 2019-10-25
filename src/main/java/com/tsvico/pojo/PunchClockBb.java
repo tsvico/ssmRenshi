@@ -8,7 +8,7 @@ import java.util.Date;
  * @time 2019/10/17 15:19
  * 功能 打卡model层
  */
-public class PunchClock {
+public class PunchClockBb {
     private Integer id;//标识
     private Integer uid;//用户ID
     private Date attendanceTime;//考勤时间
@@ -19,9 +19,8 @@ public class PunchClock {
     private int bj; //病假
     private int sj; //事假
     private int kg; //旷工
-
-    //多表关联
-    private User user;
+    private String unickname;
+    private String deparment;
 
     public Integer getId() {
         return id;
@@ -104,17 +103,26 @@ public class PunchClock {
         this.kg = kg;
     }
 
-    public User getUser() {
-        return user;
+    public String getUnickname() {
+        return unickname;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUnickname(String unickname) {
+        this.unickname = unickname;
     }
+
+    public String getDeparment() {
+        return deparment;
+    }
+
+    public void setDeparment(String deparment) {
+        this.deparment = deparment;
+    }
+
 
     @Override
     public String toString() {
-        return "PunchClock{" +
+        return "PunchClockBb{" +
                 "id=" + id +
                 ", uid=" + uid +
                 ", attendanceTime=" + attendanceTime +
@@ -125,7 +133,8 @@ public class PunchClock {
                 ", bj=" + bj +
                 ", sj=" + sj +
                 ", kg=" + kg +
-                ", user=" + user +
+                ", unickname='" + unickname + '\'' +
+                ", deparment='" + deparment + '\'' +
                 '}';
     }
 }
